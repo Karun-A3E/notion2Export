@@ -1,0 +1,133 @@
+{
+  "table_of_contents": {
+    "access": [0],
+    "conversionStart": "",
+    "conversionEnd": ""
+  },
+  "heading_1": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "# ",
+    "conversionEnd": "\n"
+  },
+  "heading_2": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "## ",
+    "conversionEnd": "\n"
+  },
+  "heading_3": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "### ",
+    "conversionEnd": "\n"
+  },
+  "paragraph": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "",
+    "conversionEnd": "\n"
+  },
+  "code": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "```\n",
+    "conversionEnd": "\n```"
+  },
+  "equation": {
+    "access": "expression",
+    "conversionStart": "equation: ",
+    "conversionEnd": ""
+  },
+  "callout": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "> ",
+    "conversionEnd": "\n"
+  },
+  "bulleted_list_item": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "- ",
+    "conversionEnd": "\n"
+  },
+  "numbered_list_item": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "1. ",
+    "conversionEnd": "\n"
+  },
+  "to_do": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "- [ ] ",
+    "conversionEnd": "\n"
+  },
+  "table": {
+    "access": [0],
+    "conversionStart": "",
+    "conversionEnd": ""
+  },
+  "toggle": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "<details><summary>",
+    "conversionEnd": "</summary>\n\n",
+    "conversionEndBlock": "</details>\n\n"
+  },
+  "quote": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "> ",
+    "conversionEnd": "\n"
+  },
+  "embed": {
+    "access": "url",
+    "conversionStart": "Embed: [",
+    "conversionEnd": "]("
+  },
+  "link_preview": {
+    "access": "url",
+    "conversionStart": "Link Preview: [",
+    "conversionEnd": "]("
+  },
+  "bookmark": {
+    "access": "url",
+    "conversionStart": "Bookmark: [",
+    "conversionEnd": "]("
+  },
+  "pdf": {
+    "access": "external.url",
+    "conversionStart": "PDF: [",
+    "conversionEnd": "]("
+  },
+  "video": {
+    "access": "external.url",
+    "conversionStart": "Video: [",
+    "conversionEnd": "]("
+  },
+  "file": {
+    "access": "external.url",
+    "conversionStart": "File: [",
+    "conversionEnd": "]("
+  },
+  "image": {
+    "access": ["file", "url"],
+    "conversionStart": "![Image](",
+    "conversionEnd": ")"
+  },
+  "child_database": {
+    "access": "title",
+    "conversionStart": "Child Database: [",
+    "conversionEnd": "]("
+  },
+  "child_page": {
+    "access": "title",
+    "conversionStart": "Child Page: [",
+    "conversionEnd": "]("
+  },
+  "template": {
+    "access": ["rich_text", ["text", "content"]],
+    "conversionStart": "Template: ",
+    "conversionEnd": "\n"
+  },
+  "breadcrumb": {
+    "access": [0],
+    "conversionStart": "",
+    "conversionEnd": ""
+  },
+  "divider": {
+    "access": [0],
+    "conversionStart": "------------\n",
+    "conversionEnd": ""
+  }
+}
