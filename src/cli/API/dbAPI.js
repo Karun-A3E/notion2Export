@@ -7,13 +7,13 @@ const notion_md = require('../modules/notion_md')
 
 
 //!--------TESTING --NEED TO REMOVE
-// require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
-// const token = process.env.API_KEY 
-// let headers= { 
-//   "Content-Type": "application/json",
-//   "Authorization": "Bearer " + token,
-//   "Notion-Version": "2022-02-22" 
-// }
+require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
+const token = process.env.API_KEY 
+let headers= { 
+  "Content-Type": "application/json",
+  "Authorization": "Bearer " + token,
+  "Notion-Version": "2022-02-22" 
+}
 //!--------TESTING --NEED TO REMOVE
 
 
@@ -90,9 +90,15 @@ const DatabaseAPI = {
         method: "POST",
         url: `https://api.notion.com/v1/databases/${databaseID}/query`,
         headers : headers,
+        sorts: [
+        ],
+        data : {},
+        filters : []
+    
 
       })
         const data = response.data;
+        return data
       // need to work on the filtering, sorting options and make it more dynamic
     } catch (error) {
         console.error('Error:', error.message);

@@ -1,7 +1,8 @@
 const fs = require('fs')
-const json = require('json');
+const path = require('path');
 
-const rawData = fs.readFileSync('./rulesConversion.json','utf-8');
+const filePath = path.join(__dirname,'./rulesConversion.json')
+const rawData = fs.readFileSync(filePath,'utf-8');
 const rulesOfAccess= JSON.parse(rawData)
 
 const notion_md = {
