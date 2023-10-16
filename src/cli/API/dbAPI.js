@@ -151,5 +151,4 @@ const DatabaseAPI = {
 }
 
 
-
 module.exports = DatabaseAPI
