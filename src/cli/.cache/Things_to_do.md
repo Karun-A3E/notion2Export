@@ -9,7 +9,7 @@
 	- [ ] Usage Of `JSON`
 	- [ ] Usage of `XML`
 - [ ] Establishing Configurations
-	- [ ] Usage of  `yaml`
+	- [ ] Usage of  `odyaml`
 	- [ ] Usage of  `JSON`
 	- [ ] Usage of  `dotenv`
 - [ ] Setting Up Commands && Properties
