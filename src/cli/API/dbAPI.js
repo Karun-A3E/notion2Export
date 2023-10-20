@@ -99,55 +99,63 @@ const DatabaseAPI = {
       })
         const data = response.data;
         return data
-      // need to work on the filtering, sorting options and make it more dynamic
     } catch (error) {
         console.error('Error:', error.message);
       throw error;
     }
   },
-  readPage : async(pageID,headers)=> {
+
+  readPage : async(pageID, headers) =>{
     try {
       const response = await axios({
-        method: "GET",
+        method: 'GET',
         url: `https://api.notion.com/v1/blocks/${pageID}/children?page_size=100`,
         headers: headers,
       });
-  
+
       const pageContent = response.data['results'];
-      const blocksArray = [];
-  
-      for (const block of pageContent) {
-        console.log(block.id)
-        if (block.has_children) {
-          console.log(block.id)
-          let childBlocks = await DatabaseAPI.retrieveChildBlock(block.id, headers);
-          blocksArray.push(childBlocks)
-        }
-        else{
-          blocksArray.push(block);
-        }
-      }
-      notion_md.convertor(blocksArray)
+      const blocksArray = await DatabaseAPI.processBlocks(pageContent, headers);
+
+      const jsonContent = JSON.stringify(blocksArray, null, 2);
+      fs.writeFileSync('tmpOSIModel.json', jsonContent);
+
+      notion_md.convertor(blocksArray);
 
     } catch (error) {
       console.error(error);
       throw error;
     }
   },
-  retrieveChildBlock : async(blockID,headers) =>{
+ retrieveChildBlock : async(blockID, headers)=> {
     try {
       const response = await axios({
-        method : "GET",
-        url : `https://api.notion.com/v1/blocks/${blockID}/children`,
-        headers : headers
+        method: 'GET',
+        url: `https://api.notion.com/v1/blocks/${blockID}/children`,
+        headers: headers,
       });
-      const content = response.data
-      return content
+      const content = response.data;
+      return content;
     } catch (error) {
-      throw error
+      throw error;
     }
+  },
+  processBlocks : async(blocks, headers)=> {
+    const blocksArray = [];
+
+    for (const block of blocks) {
+      blocksArray.push(block);
+      if (block.has_children) {
+        const childBlocks = await DatabaseAPI.retrieveChildBlock(block.id, headers);
+        blocksArray.push(...await DatabaseAPI.processBlocks(childBlocks.results, headers));
+      } 
+    }
+
+    return blocksArray;
   }
 
 }
+
+
+DatabaseAPI.readPage('ca27c50707394c99a1342397abfff7e7',headers).then(data =>{console.log(data)}).catch(error=> console.error(error))
 
 module.exports = DatabaseAPI

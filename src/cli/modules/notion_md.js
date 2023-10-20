@@ -9,14 +9,14 @@ const notion_md = {
   convertor: (conversionArray) => {
     const contentOfArray = conversionArray.map((item) => {
       if (item.object === 'list') {
-        return item.results.map((listItem) => ({ [listItem.type]: listItem[listItem.type] }));
+        return item.results.map((listItem) => ({ [listItem.type]: listItem[listItem.type],increment : listItem.incremental }));
       } else {
-        return { [item.type]: item[item.type] };
+        return { [item.type]: item[item.type],increment : item.incremental };
       }
     });
 
     const flatContentArray = [].concat(...contentOfArray);
-
+    console.log(contentOfArray)
     const convertedContent = flatContentArray.map((item) =>
       notion_md.AccessAndConvert(item)
     );
