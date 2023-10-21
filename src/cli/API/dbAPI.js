@@ -139,15 +139,28 @@ const DatabaseAPI = {
       throw error;
     }
   },
-  processBlocks : async(blocks, headers)=> {
+  nestingLevel : 0,
+  processBlocks: async (blocks, headers) => {
     const blocksArray = [];
 
     for (const block of blocks) {
-      blocksArray.push(block);
       if (block.has_children) {
+        blocksArray.push({ ...block, incremental: 0 });
+        DatabaseAPI.nestingLevel++; // Increment nesting level
         const childBlocks = await DatabaseAPI.retrieveChildBlock(block.id, headers);
+
+        // Add the "incremental" key based on the nesting level
+        childBlocks.results.forEach((childBlock) => {
+          childBlock.incremental = DatabaseAPI.nestingLevel;
+        });
+
         blocksArray.push(...await DatabaseAPI.processBlocks(childBlocks.results, headers));
-      } 
+        DatabaseAPI.nestingLevel--; // Decrement nesting level
+      } else {
+        // If it's not a child block, add the "incremental" key with the current level
+        block.incremental = DatabaseAPI.nestingLevel;
+        blocksArray.push(block);
+      }
     }
 
     return blocksArray;
@@ -155,7 +168,7 @@ const DatabaseAPI = {
 
 }
 
-
 DatabaseAPI.readPage('ca27c50707394c99a1342397abfff7e7',headers).then(data =>{console.log(data)}).catch(error=> console.error(error))
+// This page ID gets a OSI Model Notion Page
 
 module.exports = DatabaseAPI

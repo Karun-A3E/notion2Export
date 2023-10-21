@@ -24,6 +24,7 @@ const notion_md = {
     fs.writeFileSync('tmp.md', contentString);
   },
  AccessAndConvert : (obj) => {
+    let incremental = obj.increment
     const blockType = Object.keys(obj)[0];
     const rules = rulesOfAccess[blockType];
     if (rules) {
@@ -51,11 +52,12 @@ const notion_md = {
           break; 
         }
       }
-  
       if (content !== undefined) {
         const conversionStart = rules.conversionStart;
         const conversionEnd = rules.conversionEnd;
-        return conversionStart + content + conversionEnd;
+        const tabs = '\t'.repeat(incremental); // Create tabs based on the incremental value
+        return tabs + conversionStart + content + conversionEnd;
+      
       }
     }
   
