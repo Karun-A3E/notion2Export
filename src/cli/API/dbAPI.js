@@ -9,11 +9,6 @@ const notion_md = require('../modules/notion_md')
 //!--------TESTING --NEED TO REMOVE
 require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
 const token = process.env.API_KEY 
-let headers= { 
-  "Content-Type": "application/json",
-  "Authorization": "Bearer " + token,
-  "Notion-Version": "2022-02-22" 
-}
 //!--------TESTING --NEED TO REMOVE
 
 
@@ -41,14 +36,19 @@ const DatabaseAPI = {
     },
     "conditions" : {}
   },
-  responseDatabase: async (databaseID, headers, name) => {
+  headers : { 
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + token,
+    "Notion-Version": "2022-02-22" 
+  },
+  responseDatabase: async (databaseID, name) => {
     const spinner = ora('Fetching database information...').start();
     try {
       const readUrl = `https://api.notion.com/v1/databases/${databaseID}`;
       const response = await axios({
         method: 'GET',
         url: readUrl,
-        headers: headers,
+        headers: DatabaseAPI.headers,
       });
       if (response.status === 200) {
         spinner.succeed('Response Received: 200'); 
@@ -84,12 +84,12 @@ const DatabaseAPI = {
       throw error;
     }
   },
-  readDatabase: async (databaseID, headers) => {
+  readDatabase: async (databaseID) => {
     try {
       const response = await axios({ 
         method: "POST",
         url: `https://api.notion.com/v1/databases/${databaseID}/query`,
-        headers : headers,
+        headers : DatabaseAPI.headers,
         sorts: [
         ],
         data : {},
@@ -105,16 +105,16 @@ const DatabaseAPI = {
     }
   },
 
-  readPage : async(pageID, headers) =>{
+  readPage : async(pageID) =>{
     try {
       const response = await axios({
         method: 'GET',
         url: `https://api.notion.com/v1/blocks/${pageID}/children?page_size=100`,
-        headers: headers,
+        headers: DatabaseAPI.headers,
       });
 
       const pageContent = response.data['results'];
-      const blocksArray = await DatabaseAPI.processBlocks(pageContent, headers);
+      const blocksArray = await DatabaseAPI.processBlocks(pageContent,DatabaseAPI.headers);
 
       const jsonContent = JSON.stringify(blocksArray, null, 2);
       fs.writeFileSync('tmpOSIModel.json', jsonContent);
@@ -126,12 +126,12 @@ const DatabaseAPI = {
       throw error;
     }
   },
- retrieveChildBlock : async(blockID, headers)=> {
+ retrieveChildBlock : async(blockID)=> {
     try {
       const response = await axios({
         method: 'GET',
         url: `https://api.notion.com/v1/blocks/${blockID}/children`,
-        headers: headers,
+        headers: DatabaseAPI.headers,
       });
       const content = response.data;
       return content;
@@ -140,24 +140,22 @@ const DatabaseAPI = {
     }
   },
   nestingLevel : 0,
-  processBlocks: async (blocks, headers) => {
+  processBlocks: async (blocks) => {
     const blocksArray = [];
 
     for (const block of blocks) {
       if (block.has_children) {
         blocksArray.push({ ...block, incremental: 0 });
-        DatabaseAPI.nestingLevel++; // Increment nesting level
-        const childBlocks = await DatabaseAPI.retrieveChildBlock(block.id, headers);
+        DatabaseAPI.nestingLevel++;
+        const childBlocks = await DatabaseAPI.retrieveChildBlock(block.id);
 
-        // Add the "incremental" key based on the nesting level
         childBlocks.results.forEach((childBlock) => {
           childBlock.incremental = DatabaseAPI.nestingLevel;
         });
 
-        blocksArray.push(...await DatabaseAPI.processBlocks(childBlocks.results, headers));
-        DatabaseAPI.nestingLevel--; // Decrement nesting level
+        blocksArray.push(...await DatabaseAPI.processBlocks(childBlocks.results));
+        DatabaseAPI.nestingLevel--; 
       } else {
-        // If it's not a child block, add the "incremental" key with the current level
         block.incremental = DatabaseAPI.nestingLevel;
         blocksArray.push(block);
       }
@@ -167,8 +165,5 @@ const DatabaseAPI = {
   }
 
 }
-
-DatabaseAPI.readPage('ca27c50707394c99a1342397abfff7e7',headers).then(data =>{console.log(data)}).catch(error=> console.error(error))
-// This page ID gets a OSI Model Notion Page
 
 module.exports = DatabaseAPI

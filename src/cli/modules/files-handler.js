@@ -4,6 +4,8 @@ const { exec } = require('child_process');//
 const inquiry = require('./inquirer')
 const chalk = require('chalk')
 // 
+const API = require('../API/main')
+
 const set_up = {
   /**
    * @function
@@ -32,7 +34,15 @@ const set_up = {
         console.error('Error:', err);
       }
     }
+  },
+  integrationsChecker : async() =>{
+    try {
+      let ID = await inquiry.question('Enter Sample Database ID >> ',false,null);
+      let resp = await API.DatabaseAPI.responseDatabase(ID)
+    } catch (error) {
+      
+    }
   }
 };
 
-set_up.required_files()
+set_up.integrationsChecker()
