@@ -84,7 +84,7 @@ const DatabaseAPI = {
       throw error;
     }
   },
-  readDatabase: async (databaseID) => {
+  readDatabase: async (databaseID,filters) => {
     try {
       const response = await axios({ 
         method: "POST",
@@ -93,7 +93,7 @@ const DatabaseAPI = {
         sorts: [
         ],
         data : {},
-        filters : []
+        filters : [...filters]
     
 
       })
