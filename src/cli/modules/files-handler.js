@@ -43,6 +43,5 @@ const set_up = {
     }
   }
 };
-set_up.required_files()
 
 module.exports = set_up

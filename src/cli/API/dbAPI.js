@@ -11,6 +11,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.
 const token = process.env.API_KEY 
 
 
+const inquirer =require('../modules/inquirer')
 
 const DatabaseAPI = {
   databaseSchema: {
@@ -34,7 +35,7 @@ const DatabaseAPI = {
       "Multiple": false
     },
     "conditions" : {},
-    "displayProperties" : [],
+    "displayProperties" : null,
     "AccessibilityRules" : []
   },
   headers : { 
@@ -60,6 +61,7 @@ const DatabaseAPI = {
         template.database_id = data['id'];
         template.parent_id = data['parent']['page_id'];
         template.properties = data['properties'];
+        template.displayProperties =  await DatabaseAPI.establishDisplay(data['properties'])
         const CacheValue = template;
 
         const databaseInfo = {
@@ -74,7 +76,7 @@ const DatabaseAPI = {
         }
         const mergedData = { ...existingData, ...databaseInfo };
          fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2), 'utf8');
-        return true;
+        return databaseInfo
       } else {
         spinner.fail('Database Not Found'); 
         return "Database Not Found";
@@ -85,8 +87,29 @@ const DatabaseAPI = {
       throw error;
     }
   },
-  esTabDisplay : async(CacheData)=>{
-},
+  establishDisplay : async(obj) =>{
+    const key = Object.keys(obj);
+    key.forEach((item, index) => {
+      console.log(`${index + 1}. ${item}`);
+    }); 
+    try {
+      const userAnswer = inquirer.question('Enter the properties with number seperated by "," : ',true,/^\d+(,\d+)*$/);
+      const numbers = userAnswer.split(',').map((num) => parseInt(num.trim()));
+
+      // Validate if the numbers are within a valid range
+      for (const num of numbers) {
+        if (num < 1 || num > key.length) {
+          throw new Error('Invalid property number: ' + num);
+        }
+      }
+    
+      // Map the valid numbers to corresponding property keys
+      const selectedKeys = numbers.map((num) => key[num - 1]);
+
+      return selectedKeys;
+    } catch (error) {
+      console.error(error.message);
+    }  },
   readDatabase: async (databaseID,filters) => {
     try {
       const response = await axios({ 
@@ -168,7 +191,6 @@ const DatabaseAPI = {
   }
 
 }
-
 
 
 module.exports = DatabaseAPI

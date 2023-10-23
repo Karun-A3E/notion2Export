@@ -1,28 +1,19 @@
-const readline = require('readline');
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+const readlineSync = require('readline-sync')
 
 const defaultRegex = /^\w+$/;
 
 const inquiry = {
-  question: (questionString, regexRequired, questionRegex,callAnotherFunc=false,followUpModule,functName) => {
-    return new Promise((resolve, reject) => {
-      rl.question(questionString, (answer) => {
-        const regex = regexRequired ? new RegExp(questionRegex) : new RegExp(defaultRegex);
-        rl.close();
-        if (regex.test(answer)) {
-          if (callAnotherFunc==true) {
-            inquiry.callFunction(followUpModule,functName)
-          }
-          resolve(answer);
-        } else {
-          reject(false);
-        }
-      });
-    });
+  question : (questionString, regexRequired, questionRegex, callAnotherFunc = false, followUpModule, functName) => {
+    const answer = readlineSync.question(questionString);
+    const regex = regexRequired ? new RegExp(questionRegex) : new RegExp(defaultRegex);
+    if (regex.test(answer)) {
+      if (callAnotherFunc) {
+        inquiry.callFunction(followUpModule, functName);
+      }
+      return answer;
+    } else {
+      throw new Error('Input does not match the expected format.');
+    }
   },
   callFunction : (followUpModule,functName) =>{
     const moduleHandler = require(followUpModule);
@@ -30,6 +21,5 @@ const inquiry = {
     moduleHandler[functName]();
   }
 };
-
 
 module.exports = inquiry
