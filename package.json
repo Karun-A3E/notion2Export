@@ -2,7 +2,7 @@
   "name": "notion2export",
   "version": "1.0.0",
   "description": "Notion Export Automation",
-  "main": "index.js",
+  "main": "./src/cli/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +15,10 @@
   ],
   "author": "a3e",
   "license": "ISC",
+  "bin": {
+    "notion" : "./src/cli/main.js",
+    "hello" : "./src/cli/modules/optionsYargs.js"
+  },
   "bugs": {
     "url": "https://github.com/Karun-A3E/notion2Export/issues"
   },

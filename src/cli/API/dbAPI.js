@@ -93,7 +93,7 @@ const DatabaseAPI = {
         sorts: [
         ],
         data : {},
-        filters : [...filters]
+        filters : []
     
 
       })
