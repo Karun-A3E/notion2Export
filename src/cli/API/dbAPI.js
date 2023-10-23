@@ -172,7 +172,6 @@ const DatabaseAPI = {
   }
 
 }
-DatabaseAPI.readPage('ca27c50707394c99a1342397abfff7e7').then(data=>{console.log(data)}).catch(err=>{console.error(err)})
 
 
 module.exports = DatabaseAPI
