@@ -45,4 +45,4 @@ const set_up = {
   }
 };
 
-set_up.integrationsChecker()
+module.exports = set_up

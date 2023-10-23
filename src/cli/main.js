@@ -2,8 +2,9 @@
 
 const DatabaseAPI = require('./API/dbAPI');
 const PageAPI = require('./API/pageAPI');
+const file_handler = require('./modules/files-handler')
 const yargs = require('yargs');
-const fs = requier('fs')
+const fs = require('fs')
 yargs
   .scriptName('notion')
   .usage('$0 [options]')
@@ -70,6 +71,14 @@ yargs
           demandOption: true,
         });
       });
+  })
+  .command('setup <cmd>', 'Setting Up Files', (yargs) => {
+    yargs
+      .command('required', 'Download ENV', (yargs) => {
+      }, async (argv) => {
+        console.log('Setting Up');
+        file_handler.required_files()
+      })
   })
   .help()
   .argv;
