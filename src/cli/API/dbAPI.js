@@ -128,7 +128,6 @@ const DatabaseAPI = {
       fs.writeFileSync('tmpOSIModel.json', jsonContent);
 
       notion_md.convertor(blocksArray);
-      returngit
 
     } catch (error) {
       console.error(error);
