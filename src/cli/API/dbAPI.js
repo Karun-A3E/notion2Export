@@ -5,11 +5,7 @@ const chalk = require('chalk')
 const ora = require('ora'); 
 const notion_md = require('../modules/notion_md');
 
-// Need to remove
-const { exit } = require('process');
-// 
 
-const inquiry = require('../modules/inquirer')
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
 const token = process.env.API_KEY 
@@ -172,6 +168,7 @@ const DatabaseAPI = {
   }
 
 }
+
 
 
 module.exports = DatabaseAPI
