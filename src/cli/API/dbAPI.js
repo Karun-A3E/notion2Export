@@ -3,13 +3,16 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk')
 const ora = require('ora'); 
-const notion_md = require('../modules/notion_md')
+const notion_md = require('../modules/notion_md');
 
+// Need to remove
+const { exit } = require('process');
+// 
 
-//!--------TESTING --NEED TO REMOVE
+const inquiry = require('../modules/inquirer')
+
 require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
 const token = process.env.API_KEY 
-//!--------TESTING --NEED TO REMOVE
 
 
 
@@ -34,7 +37,9 @@ const DatabaseAPI = {
       "compression": false,
       "Multiple": false
     },
-    "conditions" : {}
+    "conditions" : {},
+    "displayProperties" : [],
+    "AccessibilityRules" : []
   },
   headers : { 
     "Content-Type": "application/json",
@@ -65,6 +70,7 @@ const DatabaseAPI = {
           [DbName]: CacheValue,
         };
 
+
         const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
         let existingData = {};
         try {
@@ -84,6 +90,8 @@ const DatabaseAPI = {
       throw error;
     }
   },
+  esTabDisplay : async(CacheData)=>{
+},
   readDatabase: async (databaseID,filters) => {
     try {
       const response = await axios({ 
@@ -120,6 +128,7 @@ const DatabaseAPI = {
       fs.writeFileSync('tmpOSIModel.json', jsonContent);
 
       notion_md.convertor(blocksArray);
+      returngit
 
     } catch (error) {
       console.error(error);
@@ -165,5 +174,6 @@ const DatabaseAPI = {
   }
 
 }
+
 
 module.exports = DatabaseAPI
