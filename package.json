@@ -16,9 +16,7 @@
   "author": "a3e",
   "license": "ISC",
   "bin": {
-    "notion" : "./src/cli/main.js",
-    "hello" : "./src/cli/modules/optionsYargs.js"
-  },
+    "notion" : "./src/cli/main.js"  },
   "bugs": {
     "url": "https://github.com/Karun-A3E/notion2Export/issues"
   },

@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs')
-const { exec } = require('child_process');// 
 const inquiry = require('./inquirer')
 const chalk = require('chalk')
 // 
@@ -23,11 +22,11 @@ const set_up = {
     } else {
       try {
         let api_key = await inquiry.question('Enter API Key : ', false, null);
-        exec(`echo API_Key = "${api_key}" > ${filePath}`, (error, stdout, stderr) => {
-          if (error) {
-            console.error(chalk.red('Error creating the file:', error));
+        fs.appendFile(filePath, `API_Key=${api_key}\n`, (err) => {
+          if (err) {
+            console.error(chalk.red('Error writing to .env file:', err));
           } else {
-            console.log(chalk.green('File created successfully.'));
+            console.log(chalk.green('API_Key added to .env file.'));
           }
         });
       } catch (err) {
@@ -44,5 +43,6 @@ const set_up = {
     }
   }
 };
+set_up.required_files()
 
 module.exports = set_up
