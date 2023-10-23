@@ -18,7 +18,8 @@ yargs
         });
       }, async (argv) => {
         const databaseID = argv.id;
-          const response = await DatabaseAPI.responseDatabase(databaseID);
+          DatabaseAPI.responseDatabase(databaseID).then(data=>{console.log(data)}).catch(err=>{console.error(err)})
+          
       })
       .command('read', 'Read data from a database', (yargs) => {
         yargs.option('id', {

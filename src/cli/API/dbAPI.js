@@ -70,7 +70,6 @@ const DatabaseAPI = {
           [DbName]: CacheValue,
         };
 
-
         const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
         let existingData = {};
         try {
@@ -78,7 +77,7 @@ const DatabaseAPI = {
         } catch (error) {
         }
         const mergedData = { ...existingData, ...databaseInfo };
-        fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2), 'utf8');
+         fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2), 'utf8');
         return true;
       } else {
         spinner.fail('Database Not Found'); 
@@ -173,6 +172,7 @@ const DatabaseAPI = {
   }
 
 }
+DatabaseAPI.readPage('ca27c50707394c99a1342397abfff7e7').then(data=>{console.log(data)}).catch(err=>{console.error(err)})
 
 
 module.exports = DatabaseAPI
