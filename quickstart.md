@@ -3,6 +3,8 @@
 2. Navigate to the cloned directory: `cd notion2Export`
 3. Install all dependencies using npm or yarn (depending on your package manager): npm i
 4. Perform a link using the command : ```npm link```
+5. To setup and test the notion Command run the following code : ```notion setup required```
+   5.1 After which a input is asked for a API Key >> Enter the Key
 
 ## Using the Tool
 For usage of tool start the program using ```notion``` . For the time being the interactive program is still in dev. However the commmand line is currently usable to a certain extend. To start execute the command : notion --help
