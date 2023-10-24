@@ -102,12 +102,19 @@ const DatabaseAPI = {
         }
       }
       const selectedKeys = numbers.map((num) => key[num - 1]);
+      const hele = await DatabaseAPI.establishAccess(selectedKeys)
+      console.log(hele)
       return selectedKeys;
     } catch (error) {
       console.error(error.message);
     }  },
-  establishAccess : async() =>{},
-  readDatabase: async (databaseID,filters) => {
+  establishAccess : async(arr) =>{
+    const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3',null,1).then(data=>data.results[0]['properties']).catch(erro=>{console.error(erro)})
+    const access = arr.map(item => results[item]);
+    const typeValues = access.map(item => item[item.type]);
+    return typeValues
+    },
+  readDatabase: async (databaseID,filters,ItemNumber=100) => {
     try {
       const response = await axios({ 
         method: "POST",
@@ -115,8 +122,9 @@ const DatabaseAPI = {
         headers : DatabaseAPI.headers,
         sorts: [
         ],
-        data : {},
-        filters : []
+        data : {page_size : ItemNumber},
+        filters : [],
+        
     
 
       })
@@ -186,7 +194,6 @@ const DatabaseAPI = {
 
     return blocksArray;
   }
-
 }
 
 
