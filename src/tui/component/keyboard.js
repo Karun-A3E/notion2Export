@@ -10,6 +10,10 @@ const showMenu = (items) => new Promise((resolve, reject) => {
     });
 });
 
+const toggleSelected = (item, selected) => {
+    return selected ? `[x] ${item}` : `[ ] ${item}`;
+};
+
 const terminate = async () => {
     term.grabInput(false);
     term.clear();
@@ -28,9 +32,9 @@ const TerminalUI = {
         term.clear();
         if (!Array.isArray(items)) {
             items = ["Add", "Your", "Own", "Input"];
-        };
-        items.push("Done")
-        console.log(string || "Customised your own prompt");
+        }
+        items.push("Done");
+        console.log(string || "Customize your own prompt");
         try {
             const response = await showMenu(items);
             term.eraseLineAfter.cyan(
@@ -45,9 +49,39 @@ const TerminalUI = {
             process.exit();
         }
     },
-    MultipleChoiceMenu: () => {
-        console.log("Hello World");
+    MultipleChoiceMenu: async (items, string) => {
+        term.clear();
+        if (!Array.isArray(items)) {
+            items = ["Add", "Your", "Own", "Input"];
+        }
+        items.push("Done");
+        const selectedIndices = new Set();
+
+        const updateMenu = () => {
+            term.clear();
+            console.log(string || "Select multiple options (Press 'Done' to finish):");
+            term.singleColumnMenu(items.map((item, index) => toggleSelected(item, selectedIndices.has(index))), (error, response) => {
+                if (error) {
+                    console.error('Error:', error);
+                    process.exit();
+                } else {
+                    if (response.selectedIndex !== items.length - 1) {
+                        if (selectedIndices.has(response.selectedIndex)) {
+                            selectedIndices.delete(response.selectedIndex);
+                        } else {
+                            selectedIndices.add(response.selectedIndex);
+                        }
+                        updateMenu();
+                    } else {
+                        // Exit Program
+                        term.eraseLineAfter.cyan(`Selected indices: [${[...selectedIndices]}]\n`);
+                        process.exit();
+                    }
+                }
+            });
+        };
+        updateMenu();
     }
 };
 
-TerminalUI.SingleChoiceMenu("Test")
+TerminalUI.MultipleChoiceMenu();
