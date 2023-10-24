@@ -16,7 +16,8 @@
   "author": "a3e",
   "license": "ISC",
   "bin": {
-    "notion" : "./src/cli/main.js"  },
+    "notion": "./src/cli/main.js"
+  },
   "bugs": {
     "url": "https://github.com/Karun-A3E/notion2Export/issues"
   },
@@ -29,6 +30,7 @@
     "ora": "^5.4.1",
     "path": "^0.12.7",
     "readline": "^1.3.0",
+    "terminal-kit": "^3.0.1",
     "yargs": "^17.7.2"
   }
 }
