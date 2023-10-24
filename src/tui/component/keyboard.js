@@ -26,3 +26,19 @@ const showMenu = (items) => new Promise((resolve, reject) => {
     process.exit();
   }
 })();
+
+const terminate = async () => {
+    term.grabInput(false);
+    term.clear(); // Clear the screen
+    await new Promise(resolve => setTimeout(() => resolve(), 100));
+    process.exit();
+  };
+  
+  term.on('key', (name, matches, data) => {
+    console.log("'key' event:", name);
+    if (name === 'CTRL_C') {
+      terminate();
+    }
+  });
+  
+  
