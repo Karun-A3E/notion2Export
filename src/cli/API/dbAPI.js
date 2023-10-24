@@ -96,20 +96,17 @@ const DatabaseAPI = {
       const userAnswer = inquirer.question('Enter the properties with number seperated by "," : ',true,/^\d+(,\d+)*$/);
       const numbers = userAnswer.split(',').map((num) => parseInt(num.trim()));
 
-      // Validate if the numbers are within a valid range
       for (const num of numbers) {
         if (num < 1 || num > key.length) {
           throw new Error('Invalid property number: ' + num);
         }
       }
-    
-      // Map the valid numbers to corresponding property keys
       const selectedKeys = numbers.map((num) => key[num - 1]);
-
       return selectedKeys;
     } catch (error) {
       console.error(error.message);
     }  },
+  establishAccess : async() =>{},
   readDatabase: async (databaseID,filters) => {
     try {
       const response = await axios({ 
