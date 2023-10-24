@@ -35,8 +35,8 @@ const terminate = async () => {
   };
   
   term.on('key', (name, matches, data) => {
-    console.log("'key' event:", name);
     if (name === 'CTRL_C') {
+    //   console.log("'key' event:", name);
       terminate();
     }
   });
