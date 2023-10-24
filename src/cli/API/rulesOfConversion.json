@@ -1,62 +1,70 @@
 {
   "checkbox": {
-    "access": "checkbox"
+    "access": ["checkbox"],
+    "type": "boolean",
+    "Checked" : true,
+    "Unchecked" : false
   },
   "user": {
-    "access": "id"
+    "access": ["id"],
+    "type" : "string"
   },
   "date": {
-    "access": "date.start"
+    "access": ["date", "start"]
   },
   "created_time": {
-    "access": "date.start"
+    "access": ["date", "start"]
   },
-  
   "email": {
-    "access": "email"
+    "access": ["email"],
+    "type" : "string"
   },
   "files": {
-    "access": "files[0].external.url"
+    "access": ["files", 0, "external", "url"]
   },
   "formula": {
-    "access": "formula.number"
+    "access": ["formula", "number"]
   },
   "last_edited_time": {
-    "access": "last_edited_time"
+    "access": ["last_edited_time"]
   },
   "multi_select": {
-    "access": "multi_select.options"
+    "access": ["multi_select", "options"]
   },
   "number": {
-    "access": "number.format"
+    "access": ["number", "format"],
+    "type" : "range"
   },
   "people": {
-    "access": "people[0].name"
+    "access": ["people", 0, "name"]
   },
   "phone_number": {
-    "access": "phone_number"
+    "access": ["phone_number"],
+    "type" : "string"
   },
   "relation": {
-    "access": "relation"
+    "access": ["relation"]
   },
   "rich_text": {
-    "access": "rich_text[0].text.content"
+    "access": ["rich_text", 0, "text", "content"]
   },
   "status": {
-    "access": "status.name"
+    "access": ["status", "name"],
+    "type" : "options"
   },
   "title": {
-    "access": "title[0].text.content"
+    "access": ["title", 0, "text", "content"]
   },
   "url": {
-    "access": "url"
+    "access": ["url"]
   },
   "unique_id": {
-    "access": "unique_id.prefix"
+    "access": ["unique_id", "prefix"]
   },
   "verification": {
-    "access": "verification.state"
-  },  "select": {
-    "access": "select.name"
+    "access": ["verification", "state"]
+  },
+  "select": {
+    "access": ["select", "name"]
   }
 }

@@ -64,6 +64,7 @@ const DatabaseAPI = {
         template.parent_id = data['parent']['page_id'];
         template.properties = data['properties'];
         [template.displayProperties, template.AccessibilityRules] =  await DatabaseAPI.establishDisplay(data['properties'])
+        //* template.conditions = await DatabaseAPI.establishConditions(data['properties'])
         const CacheValue = template;
 
         const databaseInfo = {
@@ -108,19 +109,37 @@ const DatabaseAPI = {
       return [selectedKeys,Accessibility];
     } catch (error) {
       console.error(error.message);
-    }  },
-     establishAccess : async (arr) => {
-      const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3', null, 1)
-        .then((data) => data.results[0]['properties'])
-        .catch((error) => {
-          console.error(error);
-        });
-      console.log(results);
-      const access = arr.map(item => results[item]);
-      const typeValues = access.map(item => item.type);
-      return (typeValues.map(item=>rulesOfAccess[item].access))
-    },
-  readDatabase: async (databaseID,databaseName=null,filters,ItemNumber=100,needFormatting=false) => {
+    }  
+  },
+  establishAccess : async (arr) => {
+      try {
+        const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3', null, 1);
+        const properties = results[0]['properties'];
+    
+        const accessRules = {};
+    
+        for (const key of arr) {
+          const type = properties[key].type;
+          const rule = rulesOfAccess[type];
+          if (rule) {
+            accessRules[key] = rule;
+          }
+        }
+    
+        // Modify the format of accessRules here
+        const formattedAccessRules = {};
+        for (const key in accessRules) {
+          formattedAccessRules[key] = accessRules[key].access;
+        }
+    
+        return formattedAccessRules;
+      } catch (error) {
+        console.error(error);
+        return {};
+      }
+  },
+    
+  readDatabase: async (databaseID,databaseName=null,filters,ItemNumber=100,requireFormating=false) => {
     try {
       const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
       let existingData = {};
@@ -139,14 +158,43 @@ const DatabaseAPI = {
         data : {page_size : ItemNumber},
         filters : [],
       })
-
-      
-      const displayProperties = existingData[databaseName]["displayProperties"];
-      const AccessibilityRules = existingData[databaseName]["AccessibilityRules"];
-      console.log(displayProperties);
-      console.log(AccessibilityRules);
-      
       const results = response.data['results'];
+
+      if (requireFormating){
+        const displayProperties = existingData[databaseName]["displayProperties"];
+        const AccessibilityRules = existingData[databaseName]["AccessibilityRules"];
+  
+        function getValueByAccessRules(obj, accessRules) {
+          let value = obj;
+        
+          for (const key of accessRules) {
+            if (value && value[key] !== undefined) {
+              value = value[key];
+            } else {
+              value = '-';
+              break;
+            }
+          }
+        
+          return value;
+        }
+        let display =[]
+        
+        results.forEach(data=>{
+          let prop = data.properties
+          let filteredProp = []
+          displayProperties.forEach(key => {
+            if (prop[key]) {
+              filteredProp.push(getValueByAccessRules(prop[key],AccessibilityRules[key]))
+            }
+          });
+          display.push(filteredProp)
+        })
+        console.log(display)
+      }else{
+        return results
+      }
+
      
         // return needFormatting ? 'hehe' : data
     } catch (error) {

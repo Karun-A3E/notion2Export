@@ -3,6 +3,7 @@
 const DatabaseAPI = require('./API/dbAPI');
 const PageAPI = require('./API/pageAPI');
 const file_handler = require('./modules/files-handler')
+const path =require('path')
 const yargs = require('yargs');
 const fs = require('fs')
 yargs
@@ -47,6 +48,10 @@ yargs
             describe: 'The name of the database',
             type: 'string',
           })
+          .option('page', {
+            describe: 'The page number',
+            type: 'number',
+          })
           .check((argv) => {
             if (!argv.id && !argv.name) {
               throw new Error('Please provide either --id or --name');
@@ -57,16 +62,19 @@ yargs
             return true;
           });
       }, async (argv) => {
-        const databaseID = argv.id 
-        const databaseName = argv.name
+        const databaseID = argv.id;
+        const databaseName = argv.name;
+        const page = argv.page; 
       
         try {
-          const response = await DatabaseAPI.readDatabase(databaseID,databaseName);
+          const response = await DatabaseAPI.readDatabase(databaseID, databaseName, null, page, true);
+      
           if (argv.output) {
             // Write the response to the specified file
             fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
             console.log(`Response written to ${argv.output}`);
           }
+      
           console.log(response);
           process.exit(0);
         } catch (error) {
@@ -75,11 +83,6 @@ yargs
         }
       })
       .command('cache', 'Cache database information', (yargs) => {
-        yargs.option('id', {
-          describe: 'The ID of the database',
-          type: 'string',
-          demandOption: true,
-        });
         yargs.option('list', {
           describe: 'List cached databases',
           type: 'boolean',
@@ -89,10 +92,7 @@ yargs
           const filePath = path.resolve(__dirname, './.cache/databaseKey.json');
           let existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
           console.log(existingData)
-        } else {
-          const databaseID = argv.id;
-          console.log('Listing Specific Database')
-        }
+        } 
       });
   })
   .command('pg <cmd>', 'Interact with pages', (yargs) => {
