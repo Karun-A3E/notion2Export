@@ -8,6 +8,11 @@ const fs = require('fs')
 yargs
   .scriptName('notion')
   .usage('$0 [options]')
+  .option('o', {
+    alias: 'output',
+    describe: 'Specify the output file for the response',
+    type: 'string',
+  })
   .command('db <cmd>', 'Interact with databases', (yargs) => {
     yargs
       .command('append', 'Append data to a database', (yargs) => {
@@ -18,7 +23,18 @@ yargs
         });
       }, async (argv) => {
         const databaseID = argv.id;
-          DatabaseAPI.responseDatabase(databaseID).then(data=>{console.log(data)}).catch(err=>{console.error(err)})
+        try {
+        const response = await DatabaseAPI.responseDatabase(databaseID);
+         if (argv.output) {
+          // Write the response to the specified file
+          fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
+          console.log(`Response written to ${argv.output}`);
+        }
+          process.exit(0);
+        } catch (err) {
+          console.error(err);
+          process.exit(1);
+        }
           
       })
       .command('read', 'Read data from a database', (yargs) => {
@@ -29,7 +45,19 @@ yargs
         });
       }, async (argv) => {
         const databaseID = argv.id;
-        const response = await DatabaseAPI.readDatabase(databaseID)
+        try {
+          const response = await DatabaseAPI.readDatabase(databaseID);
+          if (argv.output) {
+            // Write the response to the specified file
+            fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
+            console.log(`Response written to ${argv.output}`);
+          }
+          console.log(response)
+          process.exit(0)
+        } catch (error) {
+          console.error(error);
+          process.exit(1)
+        }
 
       })
       .command('cache', 'Cache database information', (yargs) => {

@@ -5,16 +5,13 @@ const chalk = require('chalk')
 const ora = require('ora'); 
 const notion_md = require('../modules/notion_md');
 
-// Need to remove
-const { exit } = require('process');
-// 
 
-const inquiry = require('../modules/inquirer')
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
 const token = process.env.API_KEY 
 
 
+const inquirer =require('../modules/inquirer')
 
 const DatabaseAPI = {
   databaseSchema: {
@@ -38,7 +35,7 @@ const DatabaseAPI = {
       "Multiple": false
     },
     "conditions" : {},
-    "displayProperties" : [],
+    "displayProperties" : null,
     "AccessibilityRules" : []
   },
   headers : { 
@@ -64,6 +61,7 @@ const DatabaseAPI = {
         template.database_id = data['id'];
         template.parent_id = data['parent']['page_id'];
         template.properties = data['properties'];
+        template.displayProperties =  await DatabaseAPI.establishDisplay(data['properties'])
         const CacheValue = template;
 
         const databaseInfo = {
@@ -78,7 +76,7 @@ const DatabaseAPI = {
         }
         const mergedData = { ...existingData, ...databaseInfo };
          fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2), 'utf8');
-        return true;
+        return databaseInfo
       } else {
         spinner.fail('Database Not Found'); 
         return "Database Not Found";
@@ -89,9 +87,34 @@ const DatabaseAPI = {
       throw error;
     }
   },
-  esTabDisplay : async(CacheData)=>{
-},
-  readDatabase: async (databaseID,filters) => {
+  establishDisplay : async(obj) =>{
+    const key = Object.keys(obj);
+    key.forEach((item, index) => {
+      console.log(`${index + 1}. ${item}`);
+    }); 
+    try {
+      const userAnswer = inquirer.question('Enter the properties with number seperated by "," : ',true,/^\d+(,\d+)*$/);
+      const numbers = userAnswer.split(',').map((num) => parseInt(num.trim()));
+
+      for (const num of numbers) {
+        if (num < 1 || num > key.length) {
+          throw new Error('Invalid property number: ' + num);
+        }
+      }
+      const selectedKeys = numbers.map((num) => key[num - 1]);
+      const hele = await DatabaseAPI.establishAccess(selectedKeys)
+      console.log(hele)
+      return selectedKeys;
+    } catch (error) {
+      console.error(error.message);
+    }  },
+  establishAccess : async(arr) =>{
+    const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3',null,1).then(data=>data.results[0]['properties']).catch(erro=>{console.error(erro)})
+    const access = arr.map(item => results[item]);
+    const typeValues = access.map(item => item[item.type]);
+    return typeValues
+    },
+  readDatabase: async (databaseID,filters,ItemNumber=100) => {
     try {
       const response = await axios({ 
         method: "POST",
@@ -99,8 +122,9 @@ const DatabaseAPI = {
         headers : DatabaseAPI.headers,
         sorts: [
         ],
-        data : {},
-        filters : []
+        data : {page_size : ItemNumber},
+        filters : [],
+        
     
 
       })
@@ -170,7 +194,6 @@ const DatabaseAPI = {
 
     return blocksArray;
   }
-
 }
 
 
