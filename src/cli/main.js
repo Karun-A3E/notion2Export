@@ -38,27 +38,41 @@ yargs
           
       })
       .command('read', 'Read data from a database', (yargs) => {
-        yargs.option('id', {
-          describe: 'The ID of the database',
-          type: 'string',
-          demandOption: true,
-        });
+        yargs
+          .option('id', {
+            describe: 'The ID of the database',
+            type: 'string',
+          })
+          .option('name', {
+            describe: 'The name of the database',
+            type: 'string',
+          })
+          .check((argv) => {
+            if (!argv.id && !argv.name) {
+              throw new Error('Please provide either --id or --name');
+            }
+            if (argv.id && argv.name) {
+              throw new Error('Please provide either --id or --name, not both');
+            }
+            return true;
+          });
       }, async (argv) => {
-        const databaseID = argv.id;
+        const databaseID = argv.id 
+        const databaseName = argv.name
+      
         try {
-          const response = await DatabaseAPI.readDatabase(databaseID);
+          const response = await DatabaseAPI.readDatabase(databaseID,databaseName);
           if (argv.output) {
             // Write the response to the specified file
             fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
             console.log(`Response written to ${argv.output}`);
           }
-          console.log(response)
-          process.exit(0)
+          console.log(response);
+          process.exit(0);
         } catch (error) {
           console.error(error);
-          process.exit(1)
+          process.exit(1);
         }
-
       })
       .command('cache', 'Cache database information', (yargs) => {
         yargs.option('id', {

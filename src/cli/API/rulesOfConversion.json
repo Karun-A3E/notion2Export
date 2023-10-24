@@ -1,0 +1,62 @@
+{
+  "checkbox": {
+    "access": "checkbox"
+  },
+  "user": {
+    "access": "id"
+  },
+  "date": {
+    "access": "date.start"
+  },
+  "created_time": {
+    "access": "date.start"
+  },
+  
+  "email": {
+    "access": "email"
+  },
+  "files": {
+    "access": "files[0].external.url"
+  },
+  "formula": {
+    "access": "formula.number"
+  },
+  "last_edited_time": {
+    "access": "last_edited_time"
+  },
+  "multi_select": {
+    "access": "multi_select.options"
+  },
+  "number": {
+    "access": "number.format"
+  },
+  "people": {
+    "access": "people[0].name"
+  },
+  "phone_number": {
+    "access": "phone_number"
+  },
+  "relation": {
+    "access": "relation"
+  },
+  "rich_text": {
+    "access": "rich_text[0].text.content"
+  },
+  "status": {
+    "access": "status.name"
+  },
+  "title": {
+    "access": "title[0].text.content"
+  },
+  "url": {
+    "access": "url"
+  },
+  "unique_id": {
+    "access": "unique_id.prefix"
+  },
+  "verification": {
+    "access": "verification.state"
+  },  "select": {
+    "access": "select.name"
+  }
+}

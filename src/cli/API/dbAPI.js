@@ -5,7 +5,9 @@ const chalk = require('chalk')
 const ora = require('ora'); 
 const notion_md = require('../modules/notion_md');
 
-
+const filePath = path.join(__dirname,'./rulesOfConversion.json')
+const rawData = fs.readFileSync(filePath,'utf-8');
+const rulesOfAccess= JSON.parse(rawData)
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.env') });
 const token = process.env.API_KEY 
@@ -61,7 +63,7 @@ const DatabaseAPI = {
         template.database_id = data['id'];
         template.parent_id = data['parent']['page_id'];
         template.properties = data['properties'];
-        template.displayProperties =  await DatabaseAPI.establishDisplay(data['properties'])
+        [template.displayProperties, template.AccessibilityRules] =  await DatabaseAPI.establishDisplay(data['properties'])
         const CacheValue = template;
 
         const databaseInfo = {
@@ -102,34 +104,51 @@ const DatabaseAPI = {
         }
       }
       const selectedKeys = numbers.map((num) => key[num - 1]);
-      const hele = await DatabaseAPI.establishAccess(selectedKeys)
-      console.log(hele)
-      return selectedKeys;
+      const Accessibility = await DatabaseAPI.establishAccess(selectedKeys)
+      return [selectedKeys,Accessibility];
     } catch (error) {
       console.error(error.message);
     }  },
-  establishAccess : async(arr) =>{
-    const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3',null,1).then(data=>data.results[0]['properties']).catch(erro=>{console.error(erro)})
-    const access = arr.map(item => results[item]);
-    const typeValues = access.map(item => item[item.type]);
-    return typeValues
+     establishAccess : async (arr) => {
+      const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3', null, 1)
+        .then((data) => data.results[0]['properties'])
+        .catch((error) => {
+          console.error(error);
+        });
+      console.log(results);
+      const access = arr.map(item => results[item]);
+      const typeValues = access.map(item => item.type);
+      return (typeValues.map(item=>rulesOfAccess[item].access))
     },
-  readDatabase: async (databaseID,filters,ItemNumber=100) => {
+  readDatabase: async (databaseID,databaseName=null,filters,ItemNumber=100,needFormatting=false) => {
     try {
+      const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
+      let existingData = {};
+      try {
+        existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        
+      } catch (error) {
+      }
+      const id = databaseID || existingData[databaseName].database_id
       const response = await axios({ 
         method: "POST",
-        url: `https://api.notion.com/v1/databases/${databaseID}/query`,
+        url: `https://api.notion.com/v1/databases/${id}/query`,
         headers : DatabaseAPI.headers,
         sorts: [
         ],
         data : {page_size : ItemNumber},
         filters : [],
-        
-    
-
       })
-        const data = response.data;
-        return data
+
+      
+      const displayProperties = existingData[databaseName]["displayProperties"];
+      const AccessibilityRules = existingData[databaseName]["AccessibilityRules"];
+      console.log(displayProperties);
+      console.log(AccessibilityRules);
+      
+      const results = response.data['results'];
+     
+        // return needFormatting ? 'hehe' : data
     } catch (error) {
         console.error('Error:', error.message);
       throw error;
@@ -146,10 +165,6 @@ const DatabaseAPI = {
 
       const pageContent = response.data['results'];
       const blocksArray = await DatabaseAPI.processBlocks(pageContent,DatabaseAPI.headers);
-
-      const jsonContent = JSON.stringify(blocksArray, null, 2);
-      fs.writeFileSync('tmpOSIModel.json', jsonContent);
-
       notion_md.convertor(blocksArray);
 
     } catch (error) {
