@@ -1,7 +1,6 @@
 const term = require('terminal-kit').terminal;
 
 const showMenu = (items) => new Promise((resolve, reject) => {
-    items.push("Done")
     term.singleColumnMenu(items, (error, response) => {
         if (error) {
             reject(error);
@@ -25,14 +24,19 @@ term.on('key', async (name, matches, data) => {
 });
 
 const TerminalUI = {
-    SingleChoiceMenu: async (items) => {
-        console.log('Testing Menu.');
+    SingleChoiceMenu: async (items, string) => {
+        term.clear();
+        if (!Array.isArray(items)) {
+            items = ["Add", "Your", "Own", "Input"];
+        };
+        items.push("Done")
+        console.log(string || "Customised your own prompt");
         try {
             const response = await showMenu(items);
             term.eraseLineAfter.cyan(
                 `#${response.selectedIndex} selected: ${response.selectedText} (${response.x},${response.y})\n`
             );
-            if (response.selectedText !== "Done") {
+            if (response.selectedText === "Done") {
                 console.log("Exit Program");
             }
         } catch (error) {
@@ -46,4 +50,4 @@ const TerminalUI = {
     }
 };
 
-TerminalUI.SingleChoiceMenu(["Hello", "World"])
+TerminalUI.SingleChoiceMenu("Test")
