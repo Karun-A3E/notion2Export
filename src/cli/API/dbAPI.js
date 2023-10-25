@@ -57,14 +57,13 @@ const DatabaseAPI = {
       if (response.status === 200) {
         spinner.succeed('Response Received: 200'); 
         const data = response.data;
-        const DbName = name || data['title'][0]['plain_text'];
+        const DbName = (name || data['title'][0]['plain_text']).split(" ").join("_");
         console.log(`Database Entry Created: ${chalk.italic(DbName)}`);
         const template = { ...DatabaseAPI.databaseSchema };
         template.database_id = data['id'];
         template.parent_id = data['parent']['page_id'];
         template.properties = data['properties'];
-        [template.displayProperties, template.AccessibilityRules] =  await DatabaseAPI.establishDisplay(data['properties'])
-        //* template.conditions = await DatabaseAPI.establishConditions(data['properties'])
+        [template.displayProperties, template.AccessibilityRules] =  await DatabaseAPI.establishDisplay(data['properties'],databaseID)
         const CacheValue = template;
 
         const databaseInfo = {
@@ -90,7 +89,7 @@ const DatabaseAPI = {
       throw error;
     }
   },
-  establishDisplay : async(obj) =>{
+  establishDisplay : async(obj,database_id) =>{
     const key = Object.keys(obj);
     key.forEach((item, index) => {
       console.log(`${index + 1}. ${item}`);
@@ -105,15 +104,15 @@ const DatabaseAPI = {
         }
       }
       const selectedKeys = numbers.map((num) => key[num - 1]);
-      const Accessibility = await DatabaseAPI.establishAccess(selectedKeys)
+      const Accessibility = await DatabaseAPI.establishAccess(selectedKeys,database_id)
       return [selectedKeys,Accessibility];
     } catch (error) {
       console.error(error.message);
     }  
   },
-  establishAccess : async (arr) => {
+  establishAccess : async (arr,databaseID) => {
       try {
-        const results = await DatabaseAPI.readDatabase('fb4851cee253442d985f0ebb859738c3', null, 1);
+        const results = await DatabaseAPI.readDatabase(databaseID, null, 1);
         const properties = results[0]['properties'];
     
         const accessRules = {};
@@ -125,8 +124,7 @@ const DatabaseAPI = {
             accessRules[key] = rule;
           }
         }
-    
-        // Modify the format of accessRules here
+
         const formattedAccessRules = {};
         for (const key in accessRules) {
           formattedAccessRules[key] = accessRules[key].access;
@@ -148,6 +146,7 @@ const DatabaseAPI = {
         
       } catch (error) {
       }
+      const dbName = databaseName || Object.keys(existingData).find(key => existingData[key].database_id.replace(/-/g, '')==databaseID);
       const id = databaseID || existingData[databaseName].database_id
       const response = await axios({ 
         method: "POST",
@@ -161,8 +160,8 @@ const DatabaseAPI = {
       const results = response.data['results'];
 
       if (requireFormating){
-        const displayProperties = existingData[databaseName]["displayProperties"];
-        const AccessibilityRules = existingData[databaseName]["AccessibilityRules"];
+        const displayProperties = existingData[dbName]["displayProperties"];
+        const AccessibilityRules = existingData[dbName]["AccessibilityRules"];
   
         function getValueByAccessRules(obj, accessRules) {
           let value = obj;
@@ -170,6 +169,14 @@ const DatabaseAPI = {
           for (const key of accessRules) {
             if (value && value[key] !== undefined) {
               value = value[key];
+        
+              // Check if the value is an array
+              if (Array.isArray(value)) {
+
+                value = value.map(item => (item && item.name) || (item.text['content'] )).join(', ');
+
+                return value=='' ? 'wrong format' : value
+              }
             } else {
               value = '-';
               break;
@@ -190,13 +197,22 @@ const DatabaseAPI = {
           });
           display.push(filteredProp)
         })
-        console.log(display)
+        const table = [];
+        display.forEach(rowData => {
+          const row = {};
+          displayProperties.forEach((property, index) => {
+            row[property] = rowData[index];
+          });
+          table.push(row);
+        });
+
+// Use console.table to display the table in the console
+console.table(table);
+return table
       }else{
         return results
       }
 
-     
-        // return needFormatting ? 'hehe' : data
     } catch (error) {
         console.error('Error:', error.message);
       throw error;
@@ -258,6 +274,5 @@ const DatabaseAPI = {
     return blocksArray;
   }
 }
-
 
 module.exports = DatabaseAPI

@@ -29,7 +29,7 @@
     "access": ["last_edited_time"]
   },
   "multi_select": {
-    "access": ["multi_select", "options"]
+    "access": ["multi_select", ["name"]]
   },
   "number": {
     "access": ["number", "format"],
@@ -53,7 +53,7 @@
     "type" : "options"
   },
   "title": {
-    "access": ["title", 0, "text", "content"]
+    "access": ["title", ["text", "content"]]
   },
   "url": {
     "access": ["url"]

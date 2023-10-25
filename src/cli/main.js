@@ -70,13 +70,10 @@ yargs
           const response = await DatabaseAPI.readDatabase(databaseID, databaseName, null, page, true);
       
           if (argv.output) {
-            // Write the response to the specified file
             fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
             console.log(`Response written to ${argv.output}`);
           }
-      
-          console.log(response);
-          process.exit(0);
+                process.exit(0);
         } catch (error) {
           console.error(error);
           process.exit(1);
@@ -125,3 +122,5 @@ yargs
   })
   .help()
   .argv;
+
+

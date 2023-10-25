@@ -33,4 +33,9 @@ As for the time being, these are the current progress made in this project :
      
      2.2. Passing in PageID and gathering the blocks for conversion
      
-  3. Converting the data from the page to markdown files -- [Currently Working on]
+  3. Converting the data from the page to markdown files 
+  4. Conversion of Properties
+   - Can convert most data types, with exception :
+      - title
+      - created
+   - MOST IMPORTANT, -- NEED  TO MAKE THE ACCESSANDCOVERT MORE EFFICIENT AND DYNAMIC
