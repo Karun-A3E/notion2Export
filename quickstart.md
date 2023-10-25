@@ -41,6 +41,7 @@ notion db read [--id <database_id> | --name <database_name>] [--page <page_numbe
 - `--id <database_id>`: The ID of the database.
 - `--name <database_name>`: The name of the database, if you are already appended it to the Document
 - `--page <page_number>`: The page number.
+- `-- extract` : Once used the resultant from the read will all be extracted and saved
 
 ### `db cache`
 
@@ -79,6 +80,12 @@ notion db append --id <database_id> -o response.json
 
 ```bash
 notion db read --name <database_name>
+```
+
+- Extract pages from the Database
+
+```bash
+notion db read --name=<db_name> --extract [--page=<number>] 
 ```
 
 - List cached databases:
