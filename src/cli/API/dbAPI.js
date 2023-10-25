@@ -137,7 +137,7 @@ const DatabaseAPI = {
       }
   },
     
-  readDatabase: async (databaseID,databaseName=null,filters,ItemNumber=100,requireFormating=false) => {
+  readDatabase: async (databaseID,databaseName=null,filters,ItemNumber=100,requireFormating=false,extract=false) => {
     try {
       const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
       let existingData = {};
@@ -148,6 +148,7 @@ const DatabaseAPI = {
       }
       const dbName = databaseName || Object.keys(existingData).find(key => existingData[key].database_id.replace(/-/g, '')==databaseID);
       const id = databaseID || existingData[databaseName].database_id
+
       const response = await axios({ 
         method: "POST",
         url: `https://api.notion.com/v1/databases/${id}/query`,
@@ -170,7 +171,6 @@ const DatabaseAPI = {
             if (value && value[key] !== undefined) {
               value = value[key];
         
-              // Check if the value is an array
               if (Array.isArray(value)) {
 
                 value = value.map(item => (item && item.name) || (item.text['content'] )).join(', ');
@@ -186,8 +186,12 @@ const DatabaseAPI = {
           return value;
         }
         let display =[]
-        
+        let exportIDs =[]
         results.forEach(data=>{
+          if(extract){
+            let pageID = data.id.replace(/-/g, '')
+            exportIDs.push(pageID)
+          }
           let prop = data.properties
           let filteredProp = []
           displayProperties.forEach(key => {
@@ -206,20 +210,26 @@ const DatabaseAPI = {
           table.push(row);
         });
 
-// Use console.table to display the table in the console
-console.table(table);
-return table
-      }else{
+        console.table(table);
+        if(extract){
+          for(i=0 ; i<=display.length; i++){
+            await DatabaseAPI.readPage(exportIDs[i],display[i][0],existingData[databaseName].file_location)
+          }
+        }
+        return table
+      } else {
         return results
       }
 
     } catch (error) {
-        console.error('Error:', error.message);
+      console.error('Error:', error.message);
       throw error;
     }
   },
 
-  readPage : async(pageID) =>{
+  readPage : async(pageID,title,fileLocation) =>{
+
+
     try {
       const response = await axios({
         method: 'GET',
@@ -229,7 +239,7 @@ return table
 
       const pageContent = response.data['results'];
       const blocksArray = await DatabaseAPI.processBlocks(pageContent,DatabaseAPI.headers);
-      notion_md.convertor(blocksArray);
+      notion_md.convertor(blocksArray,title,fileLocation);
 
     } catch (error) {
       console.error(error);
@@ -274,5 +284,6 @@ return table
     return blocksArray;
   }
 }
+
 
 module.exports = DatabaseAPI

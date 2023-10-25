@@ -52,6 +52,10 @@ yargs
             describe: 'The page number',
             type: 'number',
           })
+          .option('extract', {
+            describe: 'Enable data extraction',
+            type: 'boolean',
+          })
           .check((argv) => {
             if (!argv.id && !argv.name) {
               throw new Error('Please provide either --id or --name');
@@ -65,9 +69,9 @@ yargs
         const databaseID = argv.id;
         const databaseName = argv.name;
         const page = argv.page; 
-      
+        const shouldExtract = argv.extract; 
         try {
-          const response = await DatabaseAPI.readDatabase(databaseID, databaseName, null, page, true);
+          const response = await DatabaseAPI.readDatabase(databaseID, databaseName, null, page, true,shouldExtract);
       
           if (argv.output) {
             fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');

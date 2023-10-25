@@ -6,22 +6,47 @@ const rawData = fs.readFileSync(filePath,'utf-8');
 const rulesOfAccess= JSON.parse(rawData)
 
 const notion_md = {
-  convertor: (conversionArray) => {
+  // convertor: (conversionArray,title,file_location) => {
+  //   const contentOfArray = conversionArray.map((item) => {
+  //     if (item.object === 'list') {
+  //       return item.results.map((listItem) => ({ [listItem.type]: listItem[listItem.type],increment : listItem.incremental }));
+  //     } else {
+  //       return { [item.type]: item[item.type],increment : item.incremental };
+  //     }
+  //   });
+
+  //   const flatContentArray = [].concat(...contentOfArray);
+  //   console.log(contentOfArray)
+  //   const convertedContent = flatContentArray.map((item) =>
+  //     notion_md.AccessAndConvert(item)
+  //   );
+  //   const contentString = convertedContent.join('\n');
+  //   fs.writeFileSync('tmp.md', contentString);
+  // },
+  convertor : (conversionArray, title, file_location) => {
     const contentOfArray = conversionArray.map((item) => {
       if (item.object === 'list') {
-        return item.results.map((listItem) => ({ [listItem.type]: listItem[listItem.type],increment : listItem.incremental }));
+        return item.results.map((listItem) => ({
+          [listItem.type]: listItem[listItem.type],
+          increment: listItem.incremental,
+        }));
       } else {
-        return { [item.type]: item[item.type],increment : item.incremental };
+        return { [item.type]: item[item.type], increment: item.incremental };
       }
     });
-
+  
     const flatContentArray = [].concat(...contentOfArray);
-    console.log(contentOfArray)
+  
     const convertedContent = flatContentArray.map((item) =>
       notion_md.AccessAndConvert(item)
     );
+  
     const contentString = convertedContent.join('\n');
-    fs.writeFileSync('tmp.md', contentString);
+    const filePath = `${file_location}/${title}.md`;
+  
+    fs.writeFileSync(filePath, contentString);
+  
+    console.log(`File saved as ${filePath}`);
   },
  AccessAndConvert : (obj) => {
     let incremental = obj.increment
