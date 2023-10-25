@@ -72,7 +72,7 @@ yargs
         const shouldExtract = argv.extract; 
         try {
           const response = await DatabaseAPI.readDatabase(databaseID, databaseName, null, page, true,shouldExtract);
-      
+
           if (argv.output) {
             fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
             console.log(`Response written to ${argv.output}`);

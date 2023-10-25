@@ -155,8 +155,8 @@ const DatabaseAPI = {
         headers : DatabaseAPI.headers,
         sorts: [
         ],
-        data : {page_size : ItemNumber},
-        filters : [],
+        data : {page_size : ItemNumber, filter : extract ? existingData[databaseName].conditions : undefined},
+      
       })
       const results = response.data['results'];
 
@@ -240,7 +240,7 @@ const DatabaseAPI = {
       const pageContent = response.data['results'];
       const blocksArray = await DatabaseAPI.processBlocks(pageContent,DatabaseAPI.headers);
       notion_md.convertor(blocksArray,title,fileLocation);
-
+      return true
     } catch (error) {
       console.error(error);
       throw error;
