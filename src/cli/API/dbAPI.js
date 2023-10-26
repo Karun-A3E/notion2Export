@@ -215,7 +215,7 @@ const DatabaseAPI = {
         console.table(table);
         if(extract){
           for(i=0 ; i<=display.length; i++){
-            await DatabaseAPI.readPage(exportIDs[i],display[i][0],existingData[databaseName].file_location)
+            await DatabaseAPI.readPage(exportIDs[i],display[i][0],existingData[databaseName].file_location,databaseName)
           }
         }
         return table
@@ -229,7 +229,7 @@ const DatabaseAPI = {
     }
   },
 
-  readPage : async(pageID,title,fileLocation) =>{
+  readPage : async(pageID,title,fileLocation,dbName) =>{
 
 
     try {
@@ -241,7 +241,7 @@ const DatabaseAPI = {
 
       const pageContent = response.data['results'];
       const blocksArray = await DatabaseAPI.processBlocks(pageContent,DatabaseAPI.headers);
-      notion_md.convertor(blocksArray,title,fileLocation);
+      notion_md.convertor(blocksArray,title,fileLocation,dbName);
       return true
     } catch (error) {
       console.error(error);

@@ -5,6 +5,7 @@ node_modules
 package-lock.json
 
 src/configurations/.env
+src/configurations/logs
 
 
 src/cli/.cache/databaseKey.json
