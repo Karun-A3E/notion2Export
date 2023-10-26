@@ -94,8 +94,8 @@ const DatabaseAPI = {
     key.forEach((item, index) => {
       console.log(`${index + 1}. ${item}`);
     }); 
-    console.log(key)
-    // TUI.MultipleChoiceMenu(key)
+    // console.log(key)
+    await TUI.MultipleChoiceMenu(key)
     try {
       const userAnswer = inquirer.question('Enter the properties with number seperated by "," : ',true,/^\d+(,\d+)*$/);
       const numbers = userAnswer.split(',').map((num) => parseInt(num.trim()));
