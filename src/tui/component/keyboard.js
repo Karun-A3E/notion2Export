@@ -16,16 +16,17 @@ const toggleSelected = (item, selected) => {
   return selected ? `[x] ${item}` : `[ ] ${item}`;
 };
 
-const terminate = async () => {
+const terminate = async (returnValue) => {
   term.grabInput(false);
   term.clear();
   await new Promise(resolve => setTimeout(() => resolve(), 100));
-  process.exit();
+  console.log("Returning value before exiting:", returnValue);
+  process.exit(1);
 };
 
 term.on('key', async (name, matches, data) => {
   if (name === 'CTRL_C') {
-    await terminate();
+    await terminate(1);
   }
 });
 
@@ -48,7 +49,7 @@ const TerminalUI = {
     } catch (error) {
       console.error('Error:', error);
     } finally {
-      process.exit();
+      await terminate(1);
     }
   },
   MultipleChoiceMenu: async (items, string) => {
@@ -74,7 +75,7 @@ const TerminalUI = {
         } else {
           // Exit Program
           term.eraseLineAfter.cyan(`selected : ${[...selectedIndices]}\n`);
-          process.exit();
+          await terminate([...selectedIndices]);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -84,6 +85,4 @@ const TerminalUI = {
   }
 };
 
-module.exports = TerminalUI
-
-console.log(TerminalUI.SingleChoiceMenu())
+module.exports = TerminalUI;
