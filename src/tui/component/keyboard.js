@@ -88,5 +88,13 @@ const TerminalUI = {
   }
 };
 
-
+TerminalUI.MultipleChoiceMenu([
+  'CTF Difficulty', 'Parent item',
+  'Sub-item',       'Total Minutes',
+  'Author',         'Completed Date',
+  'Status',         'Write Up Status',
+  'Primary Tag',    'Comments',
+  'Created',        'Secondary Tag',
+  'Name'
+])
 module.exports = TerminalUI;
