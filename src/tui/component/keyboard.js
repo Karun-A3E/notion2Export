@@ -88,5 +88,8 @@ const TerminalUI = {
   }
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 96c79d643155407f1e2e9f03e63ead00232da143
 module.exports = TerminalUI;
