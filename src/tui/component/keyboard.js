@@ -21,6 +21,7 @@ const terminate = async (returnValue) => {
   term.clear();
   await new Promise(resolve => setTimeout(() => resolve(), 100));
   console.log("Returning value before exiting:", returnValue);
+  return returnValue
   process.exit(1);
 };
 
@@ -71,18 +72,21 @@ const TerminalUI = {
           } else {
             selectedIndices.add(response.selectedIndex);
           }
-          await updateMenu();
+          return await updateMenu();
         } else {
           // Exit Program
           term.eraseLineAfter.cyan(`selected : ${[...selectedIndices]}\n`);
-          await terminate([...selectedIndices]);
+          let values = await terminate([...selectedIndices]);
+          return values.map(index => (index >= 0 && index < items.length) ? items[index] : null);
         }
       } catch (error) {
         console.error('Error:', error);
       }
     };
-    await updateMenu();
+    return await updateMenu()
   }
 };
 
+
+TerminalUI.MultipleChoiceMenu().then(data=>{console.log(data)})
 module.exports = TerminalUI;
