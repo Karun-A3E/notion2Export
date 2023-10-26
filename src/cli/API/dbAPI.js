@@ -4,7 +4,7 @@ const path = require('path');
 const chalk = require('chalk')
 const ora = require('ora'); 
 const notion_md = require('../modules/notion_md');
-
+const TUI = require('../../tui/component/keyboard')
 const filePath = path.join(__dirname,'./rulesOfConversion.json')
 const rawData = fs.readFileSync(filePath,'utf-8');
 const rulesOfAccess= JSON.parse(rawData)
@@ -94,6 +94,8 @@ const DatabaseAPI = {
     key.forEach((item, index) => {
       console.log(`${index + 1}. ${item}`);
     }); 
+    console.log(key)
+    // TUI.MultipleChoiceMenu(key)
     try {
       const userAnswer = inquirer.question('Enter the properties with number seperated by "," : ',true,/^\d+(,\d+)*$/);
       const numbers = userAnswer.split(',').map((num) => parseInt(num.trim()));
