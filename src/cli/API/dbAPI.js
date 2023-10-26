@@ -139,7 +139,7 @@ const DatabaseAPI = {
       }
   },
     
-  readDatabase: async (databaseID,databaseName=null,filters,ItemNumber=100,requireFormating=false,extract=false) => {
+  readDatabase: async (databaseID,databaseName=null,ItemNumber=100,requireFormating=false,extract=false) => {
     try {
       const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
       let existingData = {};

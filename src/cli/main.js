@@ -68,10 +68,10 @@ yargs
       }, async (argv) => {
         const databaseID = argv.id;
         const databaseName = argv.name;
-        const page = argv.page; 
+        const page = argv.page==null ? undefined : argv.page; 
         const shouldExtract = argv.extract; 
         try {
-          const response = await DatabaseAPI.readDatabase(databaseID, databaseName, null, page, true,shouldExtract);
+          const response = await DatabaseAPI.readDatabase(databaseID, databaseName, page, true,shouldExtract);
 
           if (argv.output) {
             fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
