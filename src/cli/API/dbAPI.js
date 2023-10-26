@@ -4,7 +4,8 @@ const path = require('path');
 const chalk = require('chalk')
 const ora = require('ora'); 
 const notion_md = require('../modules/notion_md');
-const TUI = require('../../tui/component/keyboard')
+const TUI = require('../../tui/component/keyboard');
+const inquiry = require('../modules/inquirer');
 const filePath = path.join(__dirname,'./rulesOfConversion.json')
 const rawData = fs.readFileSync(filePath,'utf-8');
 const rulesOfAccess= JSON.parse(rawData)
@@ -13,7 +14,14 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../configurations/.
 const token = process.env.API_KEY 
 
 
-const inquirer =require('../modules/inquirer')
+const cachePath = path.resolve(__dirname, '../.cache/databaseKey.json');
+let existingData = {};
+try {
+  existingData = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+  
+} catch (error) {
+}
+
 
 const DatabaseAPI = {
   databaseSchema: {
@@ -89,25 +97,22 @@ const DatabaseAPI = {
       throw error;
     }
   },
+  resolveDatabaseIdentity : async(databaseName,databaseID)=>{
+    const dbName = databaseName || Object.keys(existingData).find(key => existingData[key].database_id.replace(/-/g, '')==databaseID);
+    const id = databaseID || existingData[databaseName].database_id
+    return [dbName,id]
+  },
   establishDisplay : async(obj,database_id) =>{
-    const key = Object.keys(obj);
-    key.forEach((item, index) => {
-      console.log(`${index + 1}. ${item}`);
-    }); 
-    // console.log(key)
-    await TUI.MultipleChoiceMenu(key)
+    const key = Object.keys(obj)
     try {
-      const userAnswer = inquirer.question('Enter the properties with number seperated by "," : ',true,/^\d+(,\d+)*$/);
-      const numbers = userAnswer.split(',').map((num) => parseInt(num.trim()));
-
+      let numbers = await TUI.MultipleChoiceMenu(key)
       for (const num of numbers) {
         if (num < 1 || num > key.length) {
           throw new Error('Invalid property number: ' + num);
         }
       }
-      const selectedKeys = numbers.map((num) => key[num - 1]);
-      const Accessibility = await DatabaseAPI.establishAccess(selectedKeys,database_id)
-      return [selectedKeys,Accessibility];
+      const Accessibility = await DatabaseAPI.establishAccess(numbers,database_id)
+      return [numbers,Accessibility];
     } catch (error) {
       console.error(error.message);
     }  
@@ -138,19 +143,25 @@ const DatabaseAPI = {
         return {};
       }
   },
-    
+  confgSettings: async (settingName, databaseName, databaseID) => {
+    try {
+      const [dbName, id] = await DatabaseAPI.resolveDatabaseIdentity(databaseName, databaseID);
+      const obj = existingData[dbName];
+  
+      if (obj && obj[settingName] !== undefined) {
+        console.log(`Current value of '${settingName}': ${obj[settingName]}`);
+        const NewValue = inquiry.question('Enter the new value : ')
+        obj[settingName] = NewValue
+      } else {
+        console.error(`Invalid key provided: '${settingName}'`);
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
   readDatabase: async (databaseID,databaseName=null,ItemNumber=100,requireFormating=false,extract=false) => {
     try {
-      const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
-      let existingData = {};
-      try {
-        existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        
-      } catch (error) {
-      }
-      const dbName = databaseName || Object.keys(existingData).find(key => existingData[key].database_id.replace(/-/g, '')==databaseID);
-      const id = databaseID || existingData[databaseName].database_id
-
+      const [dbName,id] = await DatabaseAPI.resolveDatabaseIdentity(databaseName,databaseID)
       const response = await axios({ 
         method: "POST",
         url: `https://api.notion.com/v1/databases/${id}/query`,

@@ -94,6 +94,32 @@ yargs
           let existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
           console.log(existingData)
         } 
+      })
+      .command('config', 'Edit the Settings of the Database Properties', (yargs) => {
+        yargs
+          .option('settings', {
+            describe: 'The settings to be Changed',
+            type: 'string',
+            demandOption: true, // Make 'settings' option mandatory
+          })
+          .option('id', {
+            describe: 'The ID of the database',
+            type: 'string',
+          })
+          .option('name', {
+            describe: 'The name of the database',
+            type: 'string',
+          })
+          .check((argv) => {
+            if (!argv.id && !argv.name) {
+              throw new Error('Please provide either --id or --name');
+            }
+            return true;
+          });
+      }, async (argv) => {
+        if (argv.settings) {
+          DatabaseAPI.confgSettings(argv.settings,argv.name,argv.id);
+        }
       });
   })
   .command('pg <cmd>', 'Interact with pages', (yargs) => {

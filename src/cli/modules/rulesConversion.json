@@ -47,7 +47,7 @@
   "numbered_list_item": {
     "access": ["rich_text", ["text", "content"]],
     "conversionStart": "1. ",
-    "conversionEnd": "\n"
+    "conversionEnd": ""
   },
   "to_do": {
     "access": ["rich_text", ["text", "content"]],

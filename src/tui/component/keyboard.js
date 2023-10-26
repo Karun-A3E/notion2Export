@@ -20,7 +20,6 @@ const terminate = async (returnValue) => {
   term.grabInput(false);
   term.clear();
   await new Promise(resolve => setTimeout(() => resolve(), 100));
-  console.log("Returning value before exiting:", returnValue);
   return returnValue
   process.exit(1);
 };
