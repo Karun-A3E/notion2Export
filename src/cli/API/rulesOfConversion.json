@@ -1,13 +1,9 @@
 {
   "checkbox": {
-    "access": ["checkbox"],
-    "type": "boolean",
-    "Checked" : true,
-    "Unchecked" : false
+    "access": ["checkbox"]
   },
   "user": {
-    "access": ["id"],
-    "type" : "string"
+    "access": ["id"]
   },
   "date": {
     "access": ["date", "start"]
@@ -16,8 +12,7 @@
     "access": ["date", "start"]
   },
   "email": {
-    "access": ["email"],
-    "type" : "string"
+    "access": ["email"]
   },
   "files": {
     "access": ["files", 0, "external", "url"]

@@ -86,6 +86,7 @@ const DatabaseAPI = {
         }
         const mergedData = { ...existingData, ...databaseInfo };
          fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2), 'utf8');
+
         return databaseInfo
       } else {
         spinner.fail('Database Not Found'); 
@@ -111,53 +112,108 @@ const DatabaseAPI = {
           throw new Error('Invalid property number: ' + num);
         }
       }
-      const Accessibility = await DatabaseAPI.establishAccess(numbers,database_id)
-      return [numbers,Accessibility];
+      let [displayArr, Accessibility] = await DatabaseAPI.establishAccess(numbers,database_id)
+      return [displayArr,Accessibility];
     } catch (error) {
       console.error(error.message);
     }  
   },
-  establishAccess : async (arr,databaseID) => {
-      try {
-        const results = await DatabaseAPI.readDatabase(databaseID, null, 1);
-        const properties = results[0]['properties'];
-    
-        const accessRules = {};
-    
-        for (const key of arr) {
-          const type = properties[key].type;
-          const rule = rulesOfAccess[type];
-          if (rule) {
-            accessRules[key] = rule;
+  establishAccess: async (arr, databaseID) => {
+    try {
+      const results = await DatabaseAPI.readDatabase(databaseID, null, 1);
+      const properties = results[0]['properties'];
+  
+      const accessRules = {};
+  
+      // Find the properties with type "title" in the original array
+      const titleProperties = arr.filter(key => properties[key].type === 'title');
+  
+      // Remove the title properties from the original array
+      arr = arr.filter(key => properties[key].type !== 'title');
+  
+      // If there are no title properties in the original array, find one in the properties and add it to the titleProperties array
+      if (titleProperties.length === 0) {
+        for (const key in properties) {
+          if (properties[key].type === 'title') {
+            titleProperties.push(key);
+            break;
           }
         }
-
-        const formattedAccessRules = {};
-        for (const key in accessRules) {
-          formattedAccessRules[key] = accessRules[key].access;
-        }
-    
-        return formattedAccessRules;
-      } catch (error) {
-        console.error(error);
-        return {};
       }
+  
+      // Push the title properties forward in the array
+      arr = [...titleProperties, ...arr];
+  
+      for (const key of arr) {
+        const type = properties[key].type;
+        const rule = rulesOfAccess[type];
+        if (rule) {
+          accessRules[key] = rule;
+        }
+      }
+  
+      const formattedAccessRules = {};
+      for (const key in accessRules) {
+        formattedAccessRules[key] = accessRules[key].access;
+      }
+  
+      return [arr, formattedAccessRules];
+    } catch (error) {
+      console.error(error);
+      return [[], {}];
+    }
   },
-  confgSettings: async (settingName, databaseName, databaseID) => {
+   confgSettings: async (settingName, databaseName,databaseID=undefined) => {
     try {
-      const [dbName, id] = await DatabaseAPI.resolveDatabaseIdentity(databaseName, databaseID);
-      const obj = existingData[dbName];
+      const filePath = path.resolve(__dirname, '../.cache/databaseKey.json');
+      let existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      if (databaseID!=undefined){
+        let [databaseName, id] = await DatabaseAPI.resolveDatabaseIdentity(databaseName, databaseID);
+      }
+      const obj = existingData[databaseName];
   
       if (obj && obj[settingName] !== undefined) {
         console.log(`Current value of '${settingName}': ${obj[settingName]}`);
-        const NewValue = inquiry.question('Enter the new value : ')
-        obj[settingName] = NewValue
+        const NewValue = inquiry.question('Enter the new value: ');
+
+        obj[settingName] = NewValue;
+
+        fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), 'utf8');
+        console.log(`Value of '${settingName}' updated to '${NewValue}'.`);
       } else {
         console.error(`Invalid key provided: '${settingName}'`);
       }
     } catch (error) {
       throw error;
     }
+  },
+  establishSettings : async (databaseName,databaseID) =>{
+    const [dbName, id] = await DatabaseAPI.resolveDatabaseIdentity(databaseName, databaseID);
+    const defaultProperties = {
+      "database_id": "default_id",
+      "parent_id": "default_parent_id",
+      "properties": {},
+    };
+  
+    const customProperties = {};
+    let schema = existingData[dbName]
+    for (const key in schema) {
+      if (!defaultProperties.hasOwnProperty(key)) {
+        customProperties[key] = schema[key];
+      }
+    }
+  
+  let values = Object.keys(customProperties);
+  while(true){
+    let index =await TUI.SingleChoiceMenu(values)
+    if(index<0){
+      break;
+    }
+    else{
+      await DatabaseAPI.confgSettings(values[index],dbName)
+    }
+  }
+
   },
   readDatabase: async (databaseID,databaseName=null,ItemNumber=100,requireFormating=false,extract=false) => {
     try {

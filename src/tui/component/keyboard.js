@@ -39,12 +39,19 @@ const TerminalUI = {
     items.push("Done");
     console.log(string || "Customize your own prompt");
     try {
-      const response = await showMenu(items);
-      term.eraseLineAfter.cyan(
-        `#${response.selectedIndex} selected: ${response.selectedText} (${response.x},${response.y})\n`
-      );
-      if (response.selectedText === "Done") {
-        console.log("Exit Program");
+      while (true) {
+        const response = await showMenu(items);
+        term.eraseLineAfter.cyan(
+          `#${response.selectedIndex} selected: ${response.selectedText} (${response.x},${response.y})\n`
+        );
+        if (response.selectedText === "Done") {
+          console.log("Exit Program");
+          return -1
+          break;
+        }
+        else{
+          return response.selectedIndex
+        }
       }
     } catch (error) {
       console.error('Error:', error);

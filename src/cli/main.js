@@ -26,8 +26,12 @@ yargs
         const databaseID = argv.id;
         try {
         const response = await DatabaseAPI.responseDatabase(databaseID);
+        try {
+          await DatabaseAPI.establishSettings(null,databaseID)
+        } catch (error) {
+          
+        }
          if (argv.output) {
-          // Write the response to the specified file
           fs.writeFileSync(argv.output, JSON.stringify(response), 'utf8');
           console.log(`Response written to ${argv.output}`);
         }
@@ -97,16 +101,15 @@ yargs
       })
       .command('config', 'Edit the Settings of the Database Properties', (yargs) => {
         yargs
-          .option('settings', {
-            describe: 'The settings to be Changed',
-            type: 'string',
-            demandOption: true, // Make 'settings' option mandatory
-          })
           .option('id', {
             describe: 'The ID of the database',
             type: 'string',
           })
           .option('name', {
+            describe: 'The name of the database',
+            type: 'string',
+          })
+          .option('settings', {
             describe: 'The name of the database',
             type: 'string',
           })
@@ -117,9 +120,10 @@ yargs
             return true;
           });
       }, async (argv) => {
-        if (argv.settings) {
-          DatabaseAPI.confgSettings(argv.settings,argv.name,argv.id);
-        }
+          if(argv.settings){
+            DatabaseAPI.confgSettings(argv.settings,argv.name,argv.id)
+          }
+           DatabaseAPI.establishSettings(argv.name,argv.id);
       });
   })
   .command('pg <cmd>', 'Interact with pages', (yargs) => {
